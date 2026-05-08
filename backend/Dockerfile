@@ -5,6 +5,7 @@ WORKDIR /app
 # Copiamos el wrapper de Maven y el archivo de configuración (pom.xml)
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
+RUN chmod +x mvnw
 # Descargamos las dependencias para que queden en caché y el build sea más rápido después
 RUN ./mvnw dependency:go-offline
 
