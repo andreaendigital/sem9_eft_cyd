@@ -1,0 +1,68 @@
+version: "3.9"
+
+services:
+  mysql-veterinaria:
+    image: mysql/mysql-server:latest
+    container_name: mysql-veterinaria-db
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: mydatabase
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      start_period: 20s
+      interval: 5s
+      retries: 10
+      timeout: 3s
+    volumes:
+      - mysql-data:/var/lib/mysql
+      # Copiar script de semilla de datos para ejecución automática al iniciar contenedor
+      - ./backend/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    networks:
+      - veterinaria-network
+
+  backend:
+    build: ./backend
+    container_name: veterinaria-backend
+    ports:
+      - "8081:8080"
+    depends_on:
+      mysql-veterinaria:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-veterinaria:3306/mydatabase
+      SPRING_DATASOURCE_USERNAME: myuser
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT: 20000
+      # Note: removed SPRING_DATASOURCE_HIKARI_INITIALIZATION_FAIL_TIMEOUT to
+      # avoid Hikari 'pool sealed' binding error. Configure in
+      # application.properties if needed.
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SPRING_SQL_INIT_MODE: always
+      SPRING_SQL_INIT_SCHEMA_LOCATIONS: classpath:schema.sql
+    networks:
+      - veterinaria-network
+    restart: on-failure
+
+  frontend:
+    build: ./frontend
+    container_name: veterinaria-frontend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+    environment:
+      BACKEND_URL: http://backend:8080
+    networks:
+      - veterinaria-network
+    restart: on-failure
+
+volumes:
+  mysql-data:
+
+networks:
+  veterinaria-network:
+    driver: bridge

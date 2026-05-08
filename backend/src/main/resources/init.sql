@@ -1,0 +1,24 @@
+-- IMPORTANTE: Este archivo ha sido dividido en dos archivos según responsabilidad:
+--
+-- 1. infrastructure-setup.sql (en la raíz del proyecto)
+--    → Creación de BD, usuario y permisos
+--    → Ejecutar MANUALMENTE como root UNA SOLA VEZ
+--    → NO es automático; requiere intervención del DBA/admin
+--
+-- 2. schema.sql (en src/main/resources)
+--    → Creación de tablas e inserción de datos de prueba
+--    → Se ejecuta automáticamente de dos formas:
+--       a) En Docker: mapeado a /docker-entrypoint-initdb.d/01-schema.sql
+--       b) En local: Spring Boot lo ejecuta porque spring.sql.init.mode=always
+--
+-- FLUJO EN DOCKER:
+-- 1. Ejecutar (local, antes de docker-compose):
+--    mysql -u root -p < infrastructure-setup.sql
+--
+-- 2. Ejecutar docker-compose:
+--    docker-compose up --build
+--    → MySQL levanta y ejecuta schema.sql automáticamente
+--    → Backend se conecta y valida el esquema con JPA
+--
+-- Ver schema.sql y infrastructure-setup.sql para los detalles completos.
+
