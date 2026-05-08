@@ -66,16 +66,14 @@ CREATE TABLE IF NOT EXISTS invoice_line_item (
     CONSTRAINT fk_invoice_line_item_invoice FOREIGN KEY (invoice_id) REFERENCES invoice(id) ON DELETE CASCADE
 );
 
--- Datos de prueba: usuarios con contraseña hash BCrypt (contraseña plana: 1234)
--- Hash BCrypt correcto de "1234" con 12 rondas
 INSERT INTO user (username, email, password)
-SELECT 'admin', 'admin@veterinaria.cl', '1234'
+SELECT 'admin', 'admin@veterinaria.cl', '$2a$12$R9h/lIPzHZ7C6S.zB5L7vO3YByySByvL490b0G.9kH/N98H4i0TKy'
 WHERE NOT EXISTS (SELECT 1 FROM user WHERE username = 'admin');
 
 INSERT INTO user (username, email, password)
-SELECT 'veterinario1', 'vet1@veterinaria.cl', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5YmMxSUqqhhkm'
+SELECT 'veterinario1', 'vet1@veterinaria.cl', '$2a$12$R9h/lIPzHZ7C6S.zB5L7vO3YByySByvL490b0G.9kH/N98H4i0TKy'
 WHERE NOT EXISTS (SELECT 1 FROM user WHERE username = 'veterinario1');
 
 INSERT INTO user (username, email, password)
-SELECT 'asistente', 'asist@veterinaria.cl', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5YmMxSUqqhhkm'
+SELECT 'asistente', 'asist@veterinaria.cl', '$2a$12$R9h/lIPzHZ7C6S.zB5L7vO3YByySByvL490b0G.9kH/N98H4i0TKy'
 WHERE NOT EXISTS (SELECT 1 FROM user WHERE username = 'asistente');
